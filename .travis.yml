@@ -1,0 +1,21 @@
+language: node_js
+before_install:
+  - npm install -g gulp mocha
+  - npm install
+  - npm test
+install:
+  - 'git config --global user.email "travis-ci@entercastle.com"'
+  - 'git config --global user.name "Travis Castle"'
+script:
+  - gulp docs
+  - cd docs
+  - git init
+  - 'git remote add origin "https://${GH_TOKEN}@github.com/castle-dev/le-auth-provider-firebase.git"'
+  - git checkout -B gh-pages
+  - git add .
+  - 'git commit -m "Updating documentation"'
+  - 'git push origin gh-pages -fq > /dev/null'
+env:
+  global:
+    - ENVIRONMENT=staging
+    - secure: BOyYTkgXjlK9OUxPbdxl/QJHIUT7ctXXAB6P9j6LYkmlbJI1ZCoWB6G4onBf+oDqSJYohVS8ln8piAoMtAQAt/UWkof+9md0hIEi1jeIa1zuUK9k408q2/HIHm+Aywx0K+hfsiGeBxgydS7/iiKfeJopfzCV2l05INjNCC5ATWnt58tfhOtO972uVm+830IE0+dgnq6v9lh83LE4ZbtNyyi3kO0WxQchYfxxagIxWePZ2KbvFI0n81Yrufqmi9CQiCs0P3+Fe/Q1mMWYY1VNFNywo++IfZ+QbK95a6hu2w+ITXtLzwHs/IgVzLq0iN4JmN+2mYetZYUObzMH3mKjPAxEEpRwuApcQNEZNBLaRo+wIaV233QyPwx2bpnNYCh0anTIAUi7TzxRyGFgR3FLzI0i6fH2/n80GdgiJYsAbw9O1HzFK/M/UCFmElo9k87Hm2QaYS8uQQjhFC89YeoSECX8TdbSor0GQ70yTvZiMBOttaLtkzm5GZj0cmxDL2M644unPx/x9he8eV4UJkWE9D9S/jzUFDV8ZaoNM+yAZhKg8RBLbwNzbeTiMPpJW2lR0zxeGIaJpRySRdbTY4IJCUlTRK1Z8ep3QdBSgLuqJvgYMjbSUjAQjTTKHFxt9BbXvb+LJnTWrGLY3N+TY2a1hzw0WEUfDDBz3uh8VcdYg88=
