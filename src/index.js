@@ -3,7 +3,7 @@ var Firebase = require('firebase');
 
 var AuthProviderFirebase = function (url) {
   var _ref = new Firebase(url);
-  this.create = function (email, password) {
+  this.createUser = function (email, password) {
     var deferred = q.defer();
     _ref.createUser({
       email: email,
