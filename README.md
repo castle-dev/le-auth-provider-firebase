@@ -10,7 +10,9 @@ le-auth-provider-firebase
 ## Usage
 
 ```
-  //TODO
+  var mandrillAPIKey = /* your api key */
+  var EmailProvider = require('le-email-provider-mandrill');
+  var provider = new EmailProvider(mandrillAPIKey);
 ```
 
 ## Tests
