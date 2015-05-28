@@ -1,13 +1,16 @@
 var q = require('q');
-var Firebase = require('firebase');
+var pluralize = require('pluralize');
 /**
  * A bridge between le-auth-service and Firebase
  * @class AuthProvider
- * @param {string} url the firebase url
+ * @param {string} ref the firebase root reference
+ * @param {StorageService} storage an instance of le-storage-service that is used to create records
  * @returns {service}
  */
-var AuthProviderFirebase = function (url) {
-  var _ref = new Firebase(url);
+var AuthProvider = function (ref, storage) {
+  if (!ref) { throw new Error('Firebase reference required'); }
+  var _ref = ref;
+  var _storage = storage;
   /**
    * Creates a new user
    * @function createUser
@@ -17,14 +20,28 @@ var AuthProviderFirebase = function (url) {
    * @param {string} password the user's password
    * @returns {promise}
    */
-  this.createUser = function (email, password) {
+  this.createUser = function (email, password, roles) {
     var deferred = q.defer();
     _ref.createUser({
       email: email,
       password: password
     }, function (err, authData) {
       if (err) { deferred.reject(err); }
-      else { deferred.resolve(authData.uid); }
+      else {
+        var userData = {
+          roles: {}
+        };
+        roles.forEach(function (role) {
+          var roleRef = _ref.child(pluralize(role)).push();
+          var roleKey = roleRef.key();
+          userData['roles'][role + '_id'] = roleKey;
+        });
+        var record = _storage.createRecord('User', authData.uid);
+        record.update(userData)
+        .then(function () {
+          deferred.resolve(record);
+        });
+      }
     });
     return deferred.promise;
   };
@@ -124,4 +141,4 @@ var AuthProviderFirebase = function (url) {
   }
 };
 
-module.exports = AuthProviderFirebase;
+module.exports = AuthProvider;
