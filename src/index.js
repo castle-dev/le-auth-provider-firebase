@@ -9,8 +9,10 @@ var pluralize = require('pluralize');
  */
 var AuthProvider = function (ref, storage) {
   if (!ref) { throw new Error('Firebase reference required'); }
+  if (!storage) { throw new Error('Instance of le-storage-service required'); }
   var _ref = ref;
   var _storage = storage;
+  var _provider = this;
   /**
    * Creates a new user
    * @function createUser
@@ -138,7 +140,65 @@ var AuthProvider = function (ref, storage) {
       else { deferred.resolve(); }
     });
     return deferred.promise;
-  }
+  };
+  /**
+   * Returns the authed user's record
+   * @function getAuthedUser
+   * @memberof AuthProvider
+   * @instance
+   * @returns {record}
+   */
+  this.getAuthedUser = function () {
+    var authData = _ref.getAuth();
+    if (!authData) { return; }
+    return _storage.createRecord('User', authData.uid);
+  };
+  /**
+   * Checks whether the current user has a given role
+   * @function authedUserHasRole
+   * @memberof AuthProvider
+   * @instance
+   * @param {string} role the role to check for
+   * @returns {promise}
+   */
+  this.authedUserHasRole = function (role) {
+    var deferred = q.defer();
+    if (!_provider.isAuthenticated()) { deferred.reject(); }
+    else {
+      _provider.getAuthedUser().load()
+      .then(function (data) {
+        if (typeof data.roles[role + '_id'] === "undefined") { deferred.reject(); }
+        else { deferred.resolve()}
+      }, function (err) { deferred.reject(err); });
+    }
+    return deferred.promise;
+  };
+  /**
+   * Returns a map of the authed user's role records
+   * @function getAuthedUserRoles
+   * @memberof AuthProvider
+   * @instance
+   * @returns {promise} resolves with a map of user records
+   */
+  this.getAuthedUserRoles = function () {
+    var deferred = q.defer();
+    var userRecord = _provider.getAuthedUser();
+    if (!userRecord) { deferred.reject('User must be authenticated to have roles'); }
+    else {
+      userRecord.load()
+      .then(function (data) {
+        var recordMap = {};
+        for (var key in data.roles) {
+          if (data.roles.hasOwnProperty(key)) {
+            var role = key.split('_id')[0];
+            recordMap[role] = _storage.createRecord(role, data.roles[key]);
+          }
+        }
+        deferred.resolve(recordMap);
+      }, function (err) { deferred.reject(err); });
+    }
+    return deferred.promise;
+  };
 };
 
 module.exports = AuthProvider;
