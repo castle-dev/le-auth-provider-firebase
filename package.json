@@ -1,6 +1,6 @@
 {
   "name": "le-auth-provider-firebase",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Connect le-auth-service to Firebase",
   "main": "src/index.js",
   "scripts": {
