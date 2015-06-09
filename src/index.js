@@ -32,7 +32,12 @@ var AuthProvider = function (ref, storage) {
       else {
         var userData = { roles: {} };
         for (var i = 0; i < roles.length; i += 1) {
-          var roleKey = roleIDs[i] || _ref.child(pluralize(roles[i])).push().key();
+          var roleKey;
+          if (roleIDs && roleIDs[i]) {
+            roleKey = roleIDs[i];
+          } else {
+            roleKey = _ref.child(pluralize(roles[i])).push().key();
+          }
           userData['roles'][roles[i] + '_id'] = roleKey;
         }
         var record = _storage.createRecord('User', authData.uid);
