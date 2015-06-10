@@ -22,7 +22,7 @@ var AuthProvider = function (ref, storage) {
    * @param {string} password the user's password
    * @returns {promise}
    */
-  this.createUser = function (email, password, roles) {
+  this.createUser = function (email, password, roles, roleIDs) {
     var deferred = q.defer();
     _ref.createUser({
       email: email,
@@ -30,14 +30,16 @@ var AuthProvider = function (ref, storage) {
     }, function (err, authData) {
       if (err) { deferred.reject(err); }
       else {
-        var userData = {
-          roles: {}
-        };
-        roles.forEach(function (role) {
-          var roleRef = _ref.child(pluralize(role)).push();
-          var roleKey = roleRef.key();
-          userData['roles'][role + '_id'] = roleKey;
-        });
+        var userData = { roles: {} };
+        for (var i = 0; i < roles.length; i += 1) {
+          var roleKey;
+          if (roleIDs && roleIDs[i]) {
+            roleKey = roleIDs[i];
+          } else {
+            roleKey = _ref.child(pluralize(roles[i])).push().key();
+          }
+          userData['roles'][roles[i] + '_id'] = roleKey;
+        }
         var record = _storage.createRecord('User', authData.uid);
         record.update(userData)
         .then(function () {
