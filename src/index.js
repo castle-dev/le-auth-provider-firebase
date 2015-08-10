@@ -20,7 +20,7 @@ var AuthProvider = function(ref, storage) {
   /**
    * Creates a new user
    * @function createUser
-   * @memberof AuthService
+   * @memberof AuthProvider
    * @instance
    * @param {string} email the new user's email
    * @param {string} password the new user's password
